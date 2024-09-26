@@ -1,0 +1,3 @@
+pyvespa>=0.49.0
+jupyter
+zstd
