@@ -1,4 +1,4 @@
-pyvespa>=0.54.0
+pyvespa>=0.59.0
 jupyter
 zstd
 pandas
