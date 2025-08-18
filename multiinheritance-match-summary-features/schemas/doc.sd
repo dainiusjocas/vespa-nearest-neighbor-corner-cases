@@ -1,0 +1,39 @@
+schema doc {
+    document doc {
+        field data_1 type int {
+            indexing: summary | attribute
+        }
+        field data_2 type int {
+            indexing: summary | attribute
+        }
+        field data_3 type int {
+            indexing: summary | attribute
+        }
+    }
+
+    rank-profile base_1 {
+        first-phase {
+            expression: attribute(data_1)
+        }
+        match-features: attribute(data_1)
+        summary-features: attribute(data_1)
+    }
+    rank-profile base_2 {
+        first-phase {
+            expression: attribute(data_2)
+        }
+        match-features: attribute(data_2)
+        summary-features: attribute(data_2)
+    }
+    rank-profile final_1 inherits base_1, base_2 {
+        first-phase {
+            expression: attribute(data_3) + attribute(data_2) + attribute(data_1)
+        }
+        summary-features inherits base_1, base_2 {
+            attribute(data_3)
+        }
+        match-features inherits base_1, base_2 {
+            attribute(data_3)
+        }
+    }
+}
