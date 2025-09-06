@@ -1,9 +1,8 @@
-# Embed documents without a document processor
+# Embed documents using ranking framework
 
-A demo off ONNX model based embeddings can be calculated in the content node.
+A demo off an ONNX model based embeddings calculation using Vespa's ranking framework.
 
-The demo app should help explaining what is needed to support models inference in the document processing chain.
-After all models are supported in ranking, why not use the same functionality in the docprocs?
+Is it achievable to get similar outcome in the document processing chain? Or even in the indexing language?
 
 ## Setup
 
@@ -21,13 +20,14 @@ vespaengine/vespa:8.575.21
 ```
 
 Deploy the application package:
+
 ```shell
 vespa deploy -t http://localhost:19071
 ```
 
-The onnx model is shamelessly taken from [here](https://github.com/vespa-engine/sample-apps/blob/master/custom-embeddings/models/).
+The ONNX model is shamelessly taken from [here](https://github.com/vespa-engine/sample-apps/blob/master/custom-embeddings/models/).
 
-Feed in the dummy document:
+Feed the dummy document:
 ```shell
 echo '{"id": "id:doc:doc::1", "fields": {"embedding": [1], "double_value": 2.0}}'\
 | vespa feed - \
@@ -87,7 +87,7 @@ The `onnx_embedding` has type `tensor<float>(d0[1],d1[1])` but it could be of di
 
 ### Convert a number to some tensor shape
 
-A ranking profile `embed2` where `double` is wrapped into a tensor of the required type.
+Check the `embed2` ranking profile where `double` value is wrapped into a tensor of the required type.
 
 ```shell
 vespa query 'select matchfeatures from sources * where true' \
@@ -137,7 +137,7 @@ vespa query 'select matchfeatures from sources * where true' \
 
 ## Ideas
 
-ONNX model can have many more inputs and they can all be passed with query params.
+ONNX model can have many more inputs, and they can all be passed with query params and do not use any document feature.
 
 ## Helpers
 
@@ -147,7 +147,7 @@ Let's check what inputs model expects:
 curl http://localhost:8080/model-evaluation/v1/custom_similarity
 ```
 
-Unfortunately, the output type is not visible in that output.
+Unfortunately, the model output type is not visible in that output.
 
 The output type can be checked using [`vespa-analyze-onnx-model`](https://docs.vespa.ai/en/operations/tools.html#vespa-analyze-onnx-model).
 
