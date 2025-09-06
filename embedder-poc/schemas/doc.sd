@@ -1,0 +1,48 @@
+schema doc {
+    document doc {
+        field double_value type double {
+            indexing: attribute
+        }
+        field embedding type tensor<float>(x[384]) {
+            indexing: attribute
+        }
+    }
+
+    rank-profile embed {
+        inputs {
+            query(q) tensor<float>(x[384])
+        }
+        function query_input() {
+            expression: query(q) * tensor<float>(batch[1]):[1]
+        }
+
+        function document_input() {
+            expression: attribute(embedding) * tensor<float>(batch[1]):[1]
+        }
+
+        onnx-model dnn {
+          file: models/custom_similarity.onnx
+          input "query": query_input
+          input "document": document_input
+          output "similarity": score
+        }
+
+        function onnx_embedding() {
+            # Just to get a tensor out, it doesn't matter what the model does
+            expression: onnx(dnn).score
+        }
+
+        first-phase {
+            expression: sum(onnx_embedding())
+        }
+
+        match-features: onnx_embedding
+    }
+
+    rank-profile embed2 inherits embed {
+        function document_input() {
+            # Demo that any tensor trickery can be used, e.g. wrapping a double valued document attribute
+            expression: tensor<float>(batch[1],x[384])(attribute(double_value))
+        }
+    }
+}
